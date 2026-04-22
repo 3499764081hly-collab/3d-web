@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人作品展示</title>
+    
+    <!-- Google Font Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Three.js r128 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <!-- GSAP Core -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    
+    <!-- Three.js Post-processing -->
+    <script src="https://unpkg.com/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #050505;
+            color: #ffffff;
+            font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        
+        #canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+        }
+        
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 10;
+            pointer-events: none;
+        }
+        
+        .interactive {
+            pointer-events: auto;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+    <div id="ui-layer" class="flex flex-col justify-between h-full p-8">
+        <header class="relative z-50 flex flex-row justify-between items-center">
+            <div class="font-bold text-white text-lg cursor-pointer interactive" onclick="navigateTo('home')">Dev.Solo</div>
+            <nav class="flex flex-row gap-8">
+                <a href="javascript:void(0)" class="cursor-pointer interactive tracking-[0.2em] text-gray-400 hover:text-white transition-colors" onclick="navigateTo('works')">作品</a>
+                <a href="javascript:void(0)" class="cursor-pointer interactive tracking-[0.2em] text-gray-400 hover:text-white transition-colors" onclick="navigateTo('about')">关于</a>
+                <a href="javascript:void(0)" class="cursor-pointer interactive tracking-[0.2em] text-gray-400 hover:text-white transition-colors" onclick="navigateTo('contact')">联系</a>
+            </nav>
+        </header>
+        
+        <main id="section-home" class="max-w-3xl transition-all duration-700 relative z-10">
+            <p class="tracking-[0.5em] text-gray-400 text-sm mb-6 flex items-center gap-4">
+                <span class="w-8 h-[1px] bg-gray-400 block"></span> 创意开发者
+            </p>
+            <h1 class="text-5xl md:text-7xl font-bold text-white mb-12 leading-[1.4] tracking-wide">
+                构建非凡的 <span class="text-stroke interactive cursor-default">数字体验</span>
+            </h1>
+            <div class="flex flex-row gap-6 mt-8">
+                <button onclick="navigateTo('works')" class="interactive bg-white text-black px-8 py-4 text-sm font-bold tracking-[0.2em] hover:bg-gray-200 hover:-translate-y-1 active:scale-95 active:translate-y-0 transition-all duration-300 cursor-pointer shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.3)]">
+                    浏览作品
+                </button>
+                <button onclick="navigateTo('contact')" class="interactive bg-transparent border border-white/30 text-white px-8 py-4 text-sm font-bold tracking-[0.2em] hover:border-white hover:bg-white/10 hover:-translate-y-1 active:scale-95 active:translate-y-0 transition-all duration-300 cursor-pointer">
+                    联系我
+                </button>
+            </div>
+        </main>
+        
+        <section id="section-works" class="absolute inset-0 flex flex-col justify-center px-8 md:px-24 opacity-0 -z-10 pointer-events-none transition-all duration-1000 transform translate-y-10">
+            <div class="w-full md:w-3/5">
+                <h2 class="text-5xl md:text-7xl font-black leading-[1.1] text-white mb-10">精选<br><span class="text-gray-600">作品.</span></h2>
+                <div class="h-[70vh] overflow-y-auto pr-4 custom-scrollbar">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- 作品 01 -->
+                        <a href="project-1.html" target="_blank" class="block interactive group bg-white/5 border border-white/10 hover:border-white/50 active:scale-95 transition-all duration-500 hover:-translate-y-2 cursor-pointer overflow-hidden backdrop-blur-sm">
+                            <div class="w-full aspect-video overflow-hidden bg-white/10 relative">
+                                <img src="https://placehold.co/800x450/1a1a1a/ffffff?text=Project+01" alt="作品封面" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                                <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-colors duration-500"></div>
+                            </div>
+                            <div class="p-6">
+                                <div class="flex justify-between items-start mb-4">
+                                    <h3 class="text-xl font-bold text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-gray-500 transition-all">作品 01</h3>
+                                    <svg class="w-5 h-5 text-gray-500 group-hover:text-white transition-colors transform group-hover:translate-x-3 group-hover:-translate-y-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                                </div>
+                                <p class="text-gray-400 text-sm leading-relaxed">这是一个基于 WebGL 的极简 3D 交互网站，聚焦于性能优化与沉浸感设计。</p>
+                            </div>
+                        </a>
+                        
+                        <!-- 作品 02 -->
+                        <a href="project-2.html" target="_blank" class="block interactive group bg-white/5 border border-white/10 hover:border-white/50 active:scale-95 transition-all duration-500 hover:-translate-y-2 cursor-pointer overflow-hidden backdrop-blur-sm">
+                            <div class="w-full aspect-video overflow-hidden bg-white/10 relative">
+                                <img src="https://placehold.co/800x450/1a1a1a/ffffff?text=Project+02" alt="作品封面" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                                <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-colors duration-500"></div>
+                            </div>
+                            <div class="p-6">
+                                <div class="flex justify-between items-start mb-4">
+                                    <h3 class="text-xl font-bold text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-gray-500 transition-all">作品 02</h3>
+                                    <svg class="w-5 h-5 text-gray-500 group-hover:text-white transition-colors transform group-hover:translate-x-3 group-hover:-translate-y-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                                </div>
+                                <p class="text-gray-400 text-sm leading-relaxed">一个创新的人工智能助手平台，整合了自然语言处理与创意工作流自动化。</p>
+                            </div>
+                        </a>
+
+                        <!-- 作品 03 -->
+                        <a href="project-3.html" target="_blank" class="block interactive group bg-white/5 border border-white/10 hover:border-white/50 active:scale-95 transition-all duration-500 hover:-translate-y-2 cursor-pointer overflow-hidden backdrop-blur-sm">
+                            <div class="w-full aspect-video overflow-hidden bg-white/10 relative">
+                                <img src="https://placehold.co/800x450/1a1a1a/ffffff?text=Project+03" alt="作品封面" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                                <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-colors duration-500"></div>
+                            </div>
+                            <div class="p-6">
+                                <div class="flex justify-between items-start mb-4">
+                                    <h3 class="text-xl font-bold text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-gray-500 transition-all">作品 03</h3>
+                                    <svg class="w-5 h-5 text-gray-500 group-hover:text-white transition-colors transform group-hover:translate-x-3 group-hover:-translate-y-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                                </div>
+                                <p class="text-gray-400 text-sm leading-relaxed">沉浸式虚拟现实体验空间，结合空间音频与交互式叙事元素打造。</p>
+                            </div>
+                        </a>
+
+                        <!-- 作品 04 -->
+                        <a href="project-4.html" target="_blank" class="block interactive group bg-white/5 border border-white/10 hover:border-white/50 active:scale-95 transition-all duration-500 hover:-translate-y-2 cursor-pointer overflow-hidden backdrop-blur-sm">
+                            <div class="w-full aspect-video overflow-hidden bg-white/10 relative">
+                                <img src="https://placehold.co/800x450/1a1a1a/ffffff?text=Project+04" alt="作品封面" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                                <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-colors duration-500"></div>
+                            </div>
+                            <div class="p-6">
+                                <div class="flex justify-between items-start mb-4">
+                                    <h3 class="text-xl font-bold text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-gray-500 transition-all">作品 04</h3>
+                                    <svg class="w-5 h-5 text-gray-500 group-hover:text-white transition-colors transform group-hover:translate-x-3 group-hover:-translate-y-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                                </div>
+                                <p class="text-gray-400 text-sm leading-relaxed">企业级实时数据可视化仪表盘，支持复杂图表与企业分析需求。</p>
+                            </div>
+                        </a>
+
+                        <!-- 作品 05 -->
+                        <a href="project-5.html" target="_blank" class="block interactive group bg-white/5 border border-white/10 hover:border-white/50 active:scale-95 transition-all duration-500 hover:-translate-y-2 cursor-pointer overflow-hidden backdrop-blur-sm">
+                            <div class="w-full aspect-video overflow-hidden bg-white/10 relative">
+                                <img src="https://placehold.co/800x450/1a1a1a/ffffff?text=Project+05" alt="作品封面" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                                <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-colors duration-500"></div>
+                            </div>
+                            <div class="p-6">
+                                <div class="flex justify-between items-start mb-4">
+                                    <h3 class="text-xl font-bold text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-gray-500 transition-all">作品 05</h3>
+                                    <svg class="w-5 h-5 text-gray-500 group-hover:text-white transition-colors transform group-hover:translate-x-3 group-hover:-translate-y-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                                </div>
+                                <p class="text-gray-400 text-sm leading-relaxed">AI驱动的设计系统，自动化响应式布局与无障碍检查流程。</p>
+                            </div>
+                        </a>
+
+                        <!-- 作品 06 -->
+                        <a href="project-6.html" target="_blank" class="block interactive group bg-white/5 border border-white/10 hover:border-white/50 active:scale-95 transition-all duration-500 hover:-translate-y-2 cursor-pointer overflow-hidden backdrop-blur-sm">
+                            <div class="w-full aspect-video overflow-hidden bg-white/10 relative">
+                                <img src="https://placehold.co/800x450/1a1a1a/ffffff?text=Project+06" alt="作品封面" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                                <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-colors duration-500"></div>
+                            </div>
+                            <div class="p-6">
+                                <div class="flex justify-between items-start mb-4">
+                                    <h3 class="text-xl font-bold text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-gray-500 transition-all">作品 06</h3>
+                                    <svg class="w-5 h-5 text-gray-500 group-hover:text-white transition-colors transform group-hover:translate-x-3 group-hover:-translate-y-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                                </div>
+                                <p class="text-gray-400 text-sm leading-relaxed">多人在线创意协作工具，实现实时协同创作与共同编辑体验。</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="section-about" class="absolute inset-0 flex flex-col justify-center items-end px-8 md:px-24 opacity-0 -z-10 pointer-events-none transition-all duration-1000 transform translate-y-10">
+            <div class="w-full md:w-2/5 text-right">
+                <h2 class="text-5xl md:text-7xl font-black leading-[1.1] text-white mb-10">关于<br><span class="text-gray-600">我.</span></h2>
+                <p class="text-gray-400 leading-relaxed font-light mb-6">
+                    我是一名充满热情的创意开发者，专注于构建沉浸式的数字体验。我将设计美学与前沿代码相结合，让每一个项目都兼具视觉冲击力与实用性。
+                </p>
+                <p class="text-gray-400 leading-relaxed font-light mb-8">
+                    我的技术栈包括现代前端框架、WebGL 3D 渲染以及复杂的交互动画。我相信优秀的界面不仅仅是好看，更应该能与用户产生共鸣。
+                </p>
+                <h3 class="text-sm text-gray-500 uppercase tracking-widest mb-4">Experience</h3>
+                <div class="space-y-4">
+                    <div class="border-b border-white/10 pb-4">
+                        <p class="text-white font-medium">Senior Developer</p>
+                        <p class="text-gray-500 text-sm">2024-Present</p>
+                    </div>
+                    <div class="border-b border-white/10 pb-4">
+                        <p class="text-white font-medium">Creative Technologist</p>
+                        <p class="text-gray-500 text-sm">2022-2024</p>
+                    </div>
+                    <div class="border-b border-white/10 pb-4">
+                        <p class="text-white font-medium">Frontend Engineer</p>
+                        <p class="text-gray-500 text-sm">2020-2022</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="section-contact" class="absolute inset-0 flex flex-col justify-center items-center text-center px-8 opacity-0 -z-10 pointer-events-none transition-all duration-1000 transform translate-y-10">
+            <h2 class="text-5xl md:text-7xl font-black leading-[1.1] text-white">联系<br><span class="text-gray-600">我.</span></h2>
+            <p class="text-gray-400 mt-4">我随时期待着新的项目合作、创意碰撞，或是成为你伟大愿景的一部分。随时给我发邮件吧。</p>
+            <div class="flex flex-col md:flex-row gap-4 mt-10">
+                <a href="mailto:hello@example.com" class="px-10 py-4 bg-white text-black font-bold tracking-[0.2em] hover:bg-gray-200 transition-colors duration-300 interactive">发送邮件</a>
+                <a href="https://github.com" target="_blank" class="px-10 py-4 bg-transparent border border-white text-white font-bold tracking-[0.2em] hover:bg-white hover:text-black transition-colors duration-300 interactive">访问 GitHub</a>
+            </div>
+        </section>
+        
+        <footer class="flex flex-row justify-between items-center">
+            <p class="text-gray-500 text-sm">© 2024 Dev.Solo. All rights reserved.</p>
+            <div class="flex flex-row gap-6">
+                <a href="https://github.com" target="_blank" class="interactive text-gray-400 hover:text-white transition-colors">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                    </svg>
+                </a>
+                <a href="https://twitter.com" target="_blank" class="interactive text-gray-400 hover:text-white transition-colors">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                    </svg>
+                </a>
+            </div>
+        </footer>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('canvas-container');
+            let mouseX = 0; let mouseY = 0;
+            document.addEventListener('mousemove', function(event) {
+                mouseX = (event.clientX - window.innerWidth / 2) * 0.001;
+                mouseY = (event.clientY - window.innerHeight / 2) * 0.001;
+            });
+
+            const scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x050505, 0.003);
+
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+            if (window.innerWidth > 768) camera.position.x = -1.5;
+
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            container.appendChild(renderer.domElement);
+
+            // 后处理辉光效果 (Bloom)
+            const renderScene = new THREE.RenderPass(scene, camera);
+            const bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
+            bloomPass.threshold = 0;
+            bloomPass.strength = 1.2; // 辉光强度
+            bloomPass.radius = 0.5;
+            const composer = new THREE.EffectComposer(renderer);
+            composer.addPass(renderScene);
+            composer.addPass(bloomPass);
+
+            // 粒子系统算法生成
+            const particleCount = 4000;
+            const geometry = new THREE.BufferGeometry();
+            
+            // 预计算四种形态的坐标和颜色
+            const posHome = new Float32Array(particleCount * 3); const colHome = new Float32Array(particleCount * 3);
+            const posWorks = new Float32Array(particleCount * 3); const colWorks = new Float32Array(particleCount * 3);
+            const posAbout = new Float32Array(particleCount * 3); const colAbout = new Float32Array(particleCount * 3);
+            const posContact = new Float32Array(particleCount * 3); const colContact = new Float32Array(particleCount * 3);
+
+            const color1 = new THREE.Color(0xffffff); // 首页白
+            const color2 = new THREE.Color(0x00f0ff); // 作品青
+            const color3 = new THREE.Color(0xb026ff); // 关于紫
+            const color4 = new THREE.Color(0xff3300); // 联系红
+
+            for(let i = 0; i < particleCount; i++) {
+                const i3 = i * 3;
+                // Home: 球体
+                const r = 2.5; const theta = Math.random() * Math.PI * 2; const phi = Math.acos((Math.random() * 2) - 1);
+                posHome[i3] = r * Math.sin(phi) * Math.cos(theta);
+                posHome[i3+1] = r * Math.sin(phi) * Math.sin(theta);
+                posHome[i3+2] = r * Math.cos(phi);
+                colHome[i3] = color1.r; colHome[i3+1] = color1.g; colHome[i3+2] = color1.b;
+
+                // Works: 起伏海浪
+                const x = (Math.random() - 0.5) * 10; const z = (Math.random() - 0.5) * 10;
+                posWorks[i3] = x;
+                posWorks[i3+1] = Math.sin(x*1.5) * 0.5 + Math.cos(z*1.5) * 0.5;
+                posWorks[i3+2] = z;
+                colWorks[i3] = color2.r; colWorks[i3+1] = color2.g; colWorks[i3+2] = color2.b;
+
+                // About: 星环
+                const tRadius = 3; const tTube = 0.5; const tAngle = Math.random() * Math.PI * 2; const tPos = Math.random() * Math.PI * 2;
+                posAbout[i3] = (tRadius + tTube * Math.cos(tPos)) * Math.cos(tAngle);
+                posAbout[i3+1] = tTube * Math.sin(tPos);
+                posAbout[i3+2] = (tRadius + tTube * Math.cos(tPos)) * Math.sin(tAngle);
+                colAbout[i3] = color3.r; colAbout[i3+1] = color3.g; colAbout[i3+2] = color3.b;
+
+                // Contact: 爆炸星尘
+                posContact[i3] = (Math.random() - 0.5) * 15;
+                posContact[i3+1] = (Math.random() - 0.5) * 15;
+                posContact[i3+2] = (Math.random() - 0.5) * 15;
+                colContact[i3] = color4.r; colContact[i3+1] = color4.g; colContact[i3+2] = color4.b;
+            }
+
+            // 初始化当前属性
+            const currentPos = new Float32Array(posHome);
+            const currentCol = new Float32Array(colHome);
+            geometry.setAttribute('position', new THREE.BufferAttribute(currentPos, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(currentCol, 3));
+
+            const material = new THREE.PointsMaterial({
+                size: 0.025,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending
+            });
+            const particlesMesh = new THREE.Points(geometry, material);
+            particlesMesh.position.set(1.5, 0, 0); // 强制初始向右偏移，留出左侧排版空间
+            scene.add(particlesMesh);
+
+            // 动画循环
+            const clock = new THREE.Clock();
+            function animate() {
+                requestAnimationFrame(animate);
+                const elapsedTime = clock.getElapsedTime();
+                const targetX = mouseX * 0.5; const targetY = mouseY * 0.5;
+                
+                scene.rotation.x += 0.05 * (targetY - scene.rotation.x);
+                scene.rotation.y += 0.05 * (targetX - scene.rotation.y);
+                particlesMesh.rotation.x = Math.sin(elapsedTime * 0.2) * 0.1;
+                particlesMesh.rotation.y += 0.002;
+                
+                composer.render(); // 使用特效渲染器
+            }
+            animate();
+
+            // 自适应
+            window.addEventListener('resize', function() {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                composer.setSize(window.innerWidth, window.innerHeight);
+                camera.position.x = window.innerWidth > 768 ? -1.5 : 0;
+            });
+
+            // 形态过渡动画控制器
+            let morphTarget = { progress: 0 };
+            let startPos = new Float32Array(particleCount * 3);
+            let startCol = new Float32Array(particleCount * 3);
+
+            function transitionParticles(targetPositions, targetColors) {
+                startPos.set(currentPos);
+                startCol.set(currentCol);
+                morphTarget.progress = 0;
+
+                gsap.to(morphTarget, {
+                    progress: 1,
+                    duration: 2,
+                    ease: "power3.inOut",
+                    onUpdate: () => {
+                        for(let i=0; i<particleCount*3; i++) {
+                            currentPos[i] = startPos[i] + (targetPositions[i] - startPos[i]) * morphTarget.progress;
+                            currentCol[i] = startCol[i] + (targetColors[i] - startCol[i]) * morphTarget.progress;
+                        }
+                        geometry.attributes.position.needsUpdate = true;
+                        geometry.attributes.color.needsUpdate = true;
+                    }
+                });
+            }
+
+            // 路由控制
+            const sections = ['home', 'works', 'about', 'contact'];
+            let currentSectionIndex = 0;
+            let isAnimating = false;
+
+            window.navigateTo = function(section) {
+                const targetIndex = sections.indexOf(section);
+                if (targetIndex !== -1) currentSectionIndex = targetIndex;
+                
+                sections.forEach(secId => {
+                    const el = document.getElementById('section-' + secId);
+                    if(el) {
+                        el.style.opacity = '0';
+                        el.style.pointerEvents = 'none';
+                        el.style.zIndex = '-10'; // 强制沉底，防止隐形元素劫持点击
+                        el.style.transform = 'translateY(30px)';
+                    }
+                });
+
+                const activeSection = document.getElementById('section-' + section);
+                if (activeSection) {
+                    activeSection.style.opacity = '1';
+                    activeSection.style.pointerEvents = 'auto';
+                    activeSection.style.zIndex = '10'; // 浮出水面
+                    activeSection.style.transform = 'translateY(0)';
+                }
+                
+                if (section === 'home') {
+                    transitionParticles(posHome, colHome);
+                    gsap.to(particlesMesh.position, { x: 1.5, y: 0, z: 0, duration: 2, ease: "power3.inOut" });
+                    gsap.to(particlesMesh.scale, { x: 1, y: 1, z: 1, duration: 2 });
+                } else if (section === 'works') {
+                    transitionParticles(posWorks, colWorks);
+                    gsap.to(particlesMesh.position, { x: 3.5, y: -1, z: -1, duration: 2, ease: "power3.inOut" });
+                    gsap.to(particlesMesh.scale, { x: 0.8, y: 0.8, z: 0.8, duration: 2 });
+                } else if (section === 'about') {
+                    transitionParticles(posAbout, colAbout);
+                    gsap.to(particlesMesh.position, { x: -4.5, y: 0, z: 1, duration: 2, ease: "power3.inOut" });
+                    gsap.to(particlesMesh.scale, { x: 1.2, y: 1.2, z: 1.2, duration: 2 });
+                } else if (section === 'contact') {
+                    transitionParticles(posContact, colContact);
+                    gsap.to(particlesMesh.position, { x: -1.5, y: -2, z: 2, duration: 2, ease: "power3.inOut" });
+                    gsap.to(particlesMesh.scale, { x: 1.5, y: 1.5, z: 1.5, duration: 2 });
+                }
+            }
+
+            // 滚轮事件监听
+            window.addEventListener('wheel', function(e) {
+                if (isAnimating) return;
+                const scrollContainer = e.target.closest('.custom-scrollbar');
+                if (scrollContainer) {
+                    const isAtTop = scrollContainer.scrollTop === 0;
+                    const isAtBottom = Math.abs(scrollContainer.scrollHeight - scrollContainer.clientHeight - scrollContainer.scrollTop) < 1;
+                    if (!isAtTop && e.deltaY < 0) return;
+                    if (!isAtBottom && e.deltaY > 0) return;
+                }
+                
+                if (e.deltaY > 0 && currentSectionIndex < sections.length - 1) {
+                    currentSectionIndex++;
+                } else if (e.deltaY <= 0 && currentSectionIndex > 0) {
+                    currentSectionIndex--;
+                } else { return; }
+                
+                window.navigateTo(sections[currentSectionIndex]);
+                isAnimating = true;
+                setTimeout(() => isAnimating = false, 2000);
+            });
+        });
+    </script>
+</body>
+</html>
